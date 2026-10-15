@@ -1,0 +1,76 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Container from '@/components/Container.astro';
+import Layout from './Layout.astro';
+import { formatDate, readingTime } from '@/utils/date';
+import { tagSlug } from '@/utils/posts';
+
+interface Props {
+	post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDate, updatedDate, author, category, tags, heroImage, heroAlt, canonicalURL, originalURL } = post.data;
+const ogImage = typeof heroImage === 'string' ? heroImage : heroImage?.src;
+---
+
+<Layout title={title} description={description} canonical={canonicalURL} image={ogImage} type="article">
+	<Container>
+		<article>
+			<div class="mx-auto max-w-[735px] mt-14">
+				<span class="text-sage uppercase tracking-wider text-sm font-medium">{category}</span>
+				<h1 class="text-4xl lg:text-5xl font-bold lg:tracking-tight mt-1 lg:leading-tight">{title}</h1>
+				<div class="flex gap-2 mt-3 items-center flex-wrap text-gray-400">
+					<span>{author}</span>
+					<span>•</span>
+					<time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+					<span>•</span>
+					<span>{readingTime(post.body)} min read</span>
+					{updatedDate && (
+						<>
+							<span>•</span>
+							<span>Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time></span>
+						</>
+					)}
+				</div>
+				{
+					tags.length > 0 && (
+						<div class="flex flex-wrap gap-3 mt-2">
+							{tags.map((tag) => (
+								<a href={`/tags/${tagSlug(tag)}/`} class="text-sm text-gray-500 hover:text-sage">#{tag}</a>
+							))}
+						</div>
+					)
+				}
+			</div>
+
+			{
+				heroImage && (
+					<div class="mx-auto max-w-[900px] mt-8">
+						{typeof heroImage === 'string' ? (
+							<img src={heroImage} alt={heroAlt} class="w-full rounded-sm" />
+						) : (
+							<Image src={heroImage} alt={heroAlt} width={1200} class="w-full rounded-sm" loading="eager" />
+						)}
+					</div>
+				)
+			}
+
+			<div class="mx-auto prose prose-lg mt-8">
+				<slot />
+				{
+					originalURL && (
+						<p class="not-prose mt-10 text-sm text-slate-500 border-t pt-4">
+							This article was first published on{' '}
+							<a href={originalURL} class="text-sage hover:text-sage-dark underline" rel="noopener">Medium</a>.
+						</p>
+					)
+				}
+			</div>
+		</article>
+		<div class="text-center mt-10">
+			<a href="/" class="bg-gray-100 px-5 py-3 rounded-md hover:bg-gray-200 transition">← Back to Blog</a>
+		</div>
+	</Container>
+</Layout>

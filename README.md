@@ -1,174 +1,84 @@
+# agriengg-blog
 
-# ✨ Astro Blog
+The agriengg.tech blog, served at **https://blog.agriengg.tech**.
 
-<p align="center">
-  <img src="public/favicon.svg" alt="Astro Blog Logo" width="120" height="120">
-</p>
+Built with [Astro](https://astro.build) and Tailwind, using the same fonts, colours and header as
+`home_agrienggtech` (and the same "agriengg.tech + label" wordmark as `agriengg-docs`). The output
+is a static site.
 
-<p align="center">
-  <strong>A modern, minimalist, high-performance blog platform built with Astro.js</strong>
-</p>
-
-<p align="center">
-  <a href="#demo">Demo</a> •
-  <a href="#features">Features</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#project-structure">Project Structure</a> •
-  <a href="#customization">Customization</a> •
-  <a href="#deployment">Deployment</a> •
-</p>
-
-<p align="center">
-  <img src="public/image.png" alt="Astro Blog Screenshot" width="800">
-</p>
-
-## Demo
-
-[View Live Demo](https://astro-blog-pi-ashen.vercel.app/)
-
-## Features
-
-- 🚀 **Maximum Performance** - Built with Astro.js for lightning-fast static sites
-- 🎨 **Minimalist Design** - Clean UI that focuses on content
-- 🌓 **Light/Dark Mode** - Smooth theme switching
-- 📱 **Responsive** - Perfect experience on all devices
-- ⚡ **SPA Transitions** - Smooth page navigation with transition effects
-- 📝 **Markdown & MDX** - Write posts with Markdown and extend with MDX
-- 🔍 **SEO Optimized** - Meta tags, Open Graph, and Twitter Cards
-- 📊 **Analytics** - Reading time, views, and statistics
-- 🔖 **Categorization** - Tags and categories system
-- 🔄 **RSS Feed** - Automatically generated RSS feed
-- 🎵 **Spotify Integration** - Display currently playing track
-- 🌐 **Internationalization Ready** - Prepared for multiple languages
-- 🔒 **Secure** - No unnecessary client-side JavaScript
-
-## Getting Started
-
-### Requirements
-
-- Node.js 16+ and npm/yarn
-- Spotify account (optional, for Now Playing feature)
-
-### Installation
+## Local development
 
 ```bash
-# Clone repository
-git clone https://github.com/williamcachamwri/astro-blog
-
-# Navigate to project directory
-cd astro-blog
-
-# Install dependencies
 npm install
-
-# Create .env file from template
-cp .env.example .env
-
-# Edit .env with your information
+npm run dev        # http://localhost:4321 (drafts are shown here)
+npm run build      # static site in dist/ (drafts are left out)
+npm run preview    # serve dist/ locally
 ```
 
-### Development
+## Writing a post
+
+Each post is a folder in `src/content/posts/`. The folder name becomes the URL, so
+`src/content/posts/drip-irrigation-basics/index.md` is served at `/drip-irrigation-basics/`.
+Put images next to `index.md` and link them as `./photo.jpg`; Astro resizes and compresses them.
+
+```yaml
+---
+title: Drip irrigation basics
+description: One or two sentences for the post list, search results and social cards.
+pubDate: 2026-10-15
+category: Guides            # shown above the title (defaults to "Article")
+tags: [irrigation, water]
+heroImage: ./cover.jpg      # optional, local file or https URL
+heroAlt: Drip lines in a cotton field
+draft: true                 # optional, hides the post from the live site
+---
+```
+
+Use `.mdx` instead of `.md` if a post needs components.
+
+## Moving posts over from Medium
 
 ```bash
-# Start development server
-npm run dev
+# Your latest posts (Medium's RSS feed only carries roughly the 10 most recent)
+npm run import:medium -- @your-handle
 
-# Open browser at http://localhost:4321
+# Just some of them
+npm run import:medium -- @your-handle --only https://medium.com/@your-handle/some-post-1a2b3c4d5e6f
+
+# Everything, including older posts: download your data from Medium
+# (Settings > Security and apps > Download your information), unzip it, then
+npm run import:medium -- ./medium-export/posts
 ```
 
-### Build
+The importer writes one folder per post, downloads the images next to it, and keeps the original
+publish date. It sets two fields:
 
-```bash
-# Create production build
-npm run build
+- `canonicalURL`: the Medium original. This tells search engines the Medium copy is the primary
+  one, so the blog isn't treated as duplicate content. Delete the line on a post if you want the
+  blog version to rank instead (and ideally set the canonical link on Medium to point here).
+- `originalURL`: shows a "first published on Medium" note at the end of the post.
 
-# Preview production build
-npm run preview
-```
+Medium exports don't include tags, so add `tags` and `category` by hand after importing. Folders
+that already exist are skipped unless you pass `--force`.
 
-## Project Structure
+## Layout
 
-```
-/
-├── public/             # Static assets
-├── src/
-│   ├── components/     # Reusable UI components
-│   ├── content/        # Blog content (Markdown/MDX)
-│   ├── layouts/        # Page layouts
-│   ├── pages/          # Pages and routes
-│   ├── styles/         # CSS and Tailwind
-│   └── utils/          # Utilities and helpers
-├── astro.config.mjs    # Astro configuration
-├── tailwind.config.js  # Tailwind configuration
-└── tsconfig.json       # TypeScript configuration
-```
+| Path | What it holds |
+| --- | --- |
+| `astro.config.mjs` | Site URL, integrations |
+| `src/consts.ts` | Site title, description, main site link |
+| `src/content.config.ts` | Post frontmatter schema |
+| `src/content/posts/` | The posts |
+| `src/components/Navbar.astro` | Header, same links as the main site |
+| `src/layouts/PostLayout.astro` | Article page |
+| `src/styles/global.css` | AgriEngg palette and fonts (same as home_agrienggtech) |
+| `scripts/import-medium.mjs` | Medium importer |
 
-## Customization
+RSS lives at `/rss.xml` and the sitemap at `/sitemap-index.xml`.
 
-### Changing Theme
+## Deploying on Vercel
 
-Edit `tailwind.config.js` to change colors, fonts, and other design variables:
-
-```js
-// tailwind.config.js
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        primary: {...},
-        secondary: {...}
-      },
-      fontFamily: {
-        sans: ['Inter', ...],
-        serif: [...]
-      }
-    }
-  }
-}
-```
-
-### Adding New Posts
-
-Create a new Markdown or MDX file in the `src/content/blog` directory:
-
-```md
----
-title: "Optimizing Web Performance for Better UX"
-description: "Tips and techniques for improving your website's performance and providing a better user experience."
-pubDate: 2023-01-18
-heroImage: "/placeholder.svg?height=630&width=1200"
-readingTime: "8 min read"
-tags: ["performance", "web development", "user experience"]
----
-
-Your post content here...
-```
-
-## Spotify Integration
-
-To enable the "Now Playing" feature from Spotify:
-
-1. Create an app at [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
-2. Get your Client ID and Client Secret
-3. Add them to your `.env` file:
-
-```env
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REFRESH_TOKEN=your_refresh_token
-```
-
-## Deployment
-
-### Netlify
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/williamcachamwri/astro-blog)
-
-### Vercel
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/williamcachamwri/astro-blog)
----
-
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/williamcachamwri">William Cachamwri</a>
-</p>
+1. Push this folder to its own GitHub repo and import it in Vercel. The Astro preset is picked up
+   automatically (build `npm run build`, output `dist`).
+2. In the Vercel project, add the domain `blog.agriengg.tech`.
+3. At your DNS provider, add a `CNAME` record for `blog` pointing at `cname.vercel-dns.com`.

@@ -1,0 +1,39 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '@/utils/date';
+
+interface Props {
+	post: CollectionEntry<'posts'>;
+	featured?: boolean;
+}
+
+const { post, featured = false } = Astro.props;
+const { title, description, pubDate, category, heroImage, heroAlt } = post.data;
+---
+
+<a href={`/${post.id}/`} class:list={['group block', featured && 'md:grid md:grid-cols-2 md:gap-10 md:items-center']}>
+	<div class="w-full aspect-video overflow-hidden rounded-sm bg-sage-wash">
+		{
+			heroImage ? (
+				typeof heroImage === 'string' ? (
+					<img src={heroImage} alt={heroAlt} loading="lazy" class="w-full h-full object-cover transition group-hover:scale-105" />
+				) : (
+					<Image src={heroImage} alt={heroAlt} width={800} class="w-full h-full object-cover transition group-hover:scale-105" />
+				)
+			) : (
+				<div class="w-full h-full flex items-center justify-center text-sage-light font-bold text-2xl">
+					agriengg<span class="text-sage-pale">.tech</span>
+				</div>
+			)
+		}
+	</div>
+	<div class="mt-4">
+		<span class="text-sage uppercase tracking-wider text-sm font-medium">{category}</span>
+		<h2 class:list={['font-bold text-slate-800 mt-1 group-hover:text-sage-dark transition', featured ? 'text-3xl lg:text-4xl lg:tracking-tight' : 'text-xl']}>
+			{title}
+		</h2>
+		<p class:list={['text-slate-500 mt-2', featured ? 'text-lg' : 'line-clamp-3']}>{description}</p>
+		<time class="block text-sm text-gray-400 mt-3" datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+	</div>
+</a>

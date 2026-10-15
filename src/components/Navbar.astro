@@ -1,0 +1,74 @@
+---
+// Same header as home_agrienggtech's navbar, with a small "blog" label after the wordmark
+// (matching docs.agriengg.tech). Links point back to the main site.
+import Container from './Container.astro';
+import { MAIN_SITE } from '@/consts';
+
+const menuitems = [
+	{ title: 'Weather', path: `${MAIN_SITE}/weather` },
+	{ title: 'News', path: `${MAIN_SITE}/news` },
+	{ title: 'Docs', path: 'https://docs.agriengg.tech/' },
+	{ title: 'Blog', path: '/', current: true },
+	{ title: 'Contact', path: `${MAIN_SITE}/contact` },
+];
+---
+
+<Container>
+	<header class="flex flex-col lg:flex-row justify-between items-center my-5">
+		<div class="flex w-full lg:w-auto items-center justify-between">
+			<a href="/" class="flex items-center gap-2 text-lg font-bold text-slate-800" aria-label="agriengg.tech blog">
+				<span>agriengg<span class="text-slate-500">.tech</span></span>
+				<span class="text-xs leading-none font-semibold px-[0.45rem] py-[0.2rem] rounded-full text-slate-600 bg-slate-100">blog</span>
+			</a>
+			<button
+				id="menu-toggle"
+				class="block lg:hidden text-gray-800"
+				aria-label="Toggle menu"
+				aria-expanded="false"
+				aria-controls="menu-items">
+				<svg fill="currentColor" class="w-4 h-4" viewBox="0 0 20 20" aria-hidden="true">
+					<path fill-rule="evenodd" clip-rule="evenodd" d="M3 5h14a1 1 0 010 2H3a1 1 0 110-2zm0 4h14a1 1 0 010 2H3a1 1 0 110-2zm0 4h14a1 1 0 010 2H3a1 1 0 010-2z"></path>
+				</svg>
+			</button>
+		</div>
+		<nav id="menu-items" class="hidden w-full lg:w-auto mt-2 lg:flex lg:mt-0">
+			<ul class="flex flex-col lg:flex-row lg:gap-3">
+				{
+					menuitems.map((item) => (
+						<li>
+							<a
+								href={item.path}
+								aria-current={item.current ? 'page' : undefined}
+								class:list={[
+									'flex lg:px-3 py-2 items-center hover:text-gray-900',
+									item.current ? 'text-gray-900 font-medium' : 'text-gray-600',
+								]}>
+								{item.title}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			<div class="lg:hidden flex items-center mt-3">
+				<a href={MAIN_SITE} class="w-full rounded-sm text-center px-4 py-2 bg-black text-white hover:bg-gray-800 border-2 border-transparent transition">
+					Visit agriengg.tech
+				</a>
+			</div>
+		</nav>
+		<div class="hidden lg:flex items-center gap-4">
+			<a href="/rss.xml" class="text-sm font-medium text-gray-700 hover:text-black">RSS</a>
+			<a href={MAIN_SITE} class="rounded-sm text-center px-4 py-2 bg-black text-white hover:bg-gray-800 border-2 border-transparent transition focus-visible:ring-2 ring-offset-2 ring-gray-200">
+				Visit agriengg.tech
+			</a>
+		</div>
+	</header>
+</Container>
+
+<script>
+	const toggle = document.getElementById('menu-toggle');
+	const menu = document.getElementById('menu-items');
+	toggle?.addEventListener('click', () => {
+		const open = menu?.classList.toggle('hidden') === false;
+		toggle.setAttribute('aria-expanded', String(open));
+	});
+</script>
